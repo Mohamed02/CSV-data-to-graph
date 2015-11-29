@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+ <html>
+	 <head>
+	 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	 <script src="lib/scripts/highcharts.js"></script>
+	 <script>
+	 <!-- ***** Declaring global varible for holding data for plotting graph -->
+	graph_data=[];
+	$(function () {
+	$.when(
+	
+	<!-- **** Reading and processing data from csv file through jQuery ajax call -->
+	 $.get('data/data.csv',function(data,status){
+			var dateArray=[];
+			var countArray=[];
+			var processed_data=[];
+			var raw_data=data.split("\n");
+				for (i=1;i<raw_data.length;i++){
+				temp_arr=raw_data[i].split(";")
+				console.log("***"+temp_arr[2]=="yes"+" for "+temp_arr[2]);
+					if(temp_arr[2] && temp_arr[2].localeCompare("yes")==1){
+					if(dateArray.indexOf(temp_arr[0])==-1){
+					dateArray.push(temp_arr[0])
+					countArray.push(1);
+					}
+					else{
+					temp_index=dateArray.indexOf(temp_arr[0]);
+					countArray[temp_index]++;
+					}
+					}
+				}
+				processed_data.push(dateArray);
+				processed_data.push(countArray)
+				graph_data=processed_data;
+	 })
+
+	).then(function(){
+	
+	<!-- ****Initializing highcharts -->
+		$('#container').highcharts({
+			title: {
+				text: 'Dashboard',
+				x: -20 //center
+			},
+			subtitle: {
+				text: '',
+				x: -20
+			},
+			xAxis: {
+				categories: graph_data[0]
+			},
+			yAxis: {
+				title: {
+					text: 'No of Responses received'
+				},
+				plotLines: [{
+					value: 0,
+					width: 1,
+					color: '#808080'
+				}]
+			},
+			tooltip: {
+				valueSuffix: ''
+			},
+			legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle',
+				borderWidth: 0
+			},
+			series: [{
+				name: 'yes',
+				data: graph_data[1]
+			}]
+		});
+	})
+	function get_data(){
+
+	}
+	});
+	 </script>
+	 </head>
+ <body>
+ <div id="container">
+ </div>
+ </body>
+ </html>
